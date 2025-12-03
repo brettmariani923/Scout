@@ -1,0 +1,85 @@
+﻿require("dotenv").config();
+
+const express = require("express");
+const cors = require("cors");
+const nodemailer = require("nodemailer");
+
+const app = express();
+
+const PORT = process.env.PORT || 3000;
+const SMTP_HOST = process.env.SMTP_HOST;
+const SMTP_PORT = Number(process.env.SMTP_PORT || 587);
+const SMTP_SECURE = process.env.SMTP_SECURE === "true";
+const SMTP_USER = process.env.SMTP_USER;
+const SMTP_PASS = process.env.SMTP_PASS;
+const FROM_ADDRESS = process.env.FROM_ADDRESS || SMTP_USER;
+
+// Allow requests from the extension (localhost for dev)
+app.use(cors());
+app.use(express.json({ limit: "10mb" }));
+
+const transporter = nodemailer.createTransport({
+    host: SMTP_HOST,
+    port: SMTP_PORT,
+    secure: SMTP_SECURE,
+    auth: {
+        user: SMTP_USER,
+        pass: SMTP_PASS
+    }
+});
+
+app.post("/email", async (req, res) => {
+    try {
+        const { image, url, title, email, timestamp } = req.body;
+
+        if (!image || !url || !email) {
+            return res.status(400).json({ error: "Missing required fields." });
+        }
+
+        // image is a data URL: "data:image/png;base64,...."
+        const base64Data = image.split(";base64,").pop();
+
+        const subject = `Scout Alert: Blocked site visited`;
+        const htmlBody = `
+            <p>Scout detected a blocked site.</p>
+            <ul>
+                <li><strong>URL:</strong> ${escapeHtml(url)}</li>
+                <li><strong>Title:</strong> ${escapeHtml(title || "")}</li>
+                <li><strong>Time (UTC):</strong> ${escapeHtml(timestamp || "")}</li>
+            </ul>
+            <p>Screenshot is attached.</p>
+        `;
+
+        await transporter.sendMail({
+            from: FROM_ADDRESS,
+            to: email,
+            subject: subject,
+            html: htmlBody,
+            attachments: [
+                {
+                    filename: "screenshot.png",
+                    content: base64Data,
+                    encoding: "base64"
+                }
+            ]
+        });
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error("Error sending Scout email:", err);
+        res.status(500).json({ error: "Failed to send email." });
+    }
+});
+
+// Basic HTML escape
+function escapeHtml(str) {
+    return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+app.listen(PORT, () => {
+    console.log(`Scout email server running on http://localhost:${PORT}`);
+});

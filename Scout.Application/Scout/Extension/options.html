@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Scout Settings</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="scout-body">
+    <div class="scout-card">
+        <h1>Scout Settings</h1>
+
+        <div class="scout-section">
+            <label for="blockedSites">Blocked websites (one per line):</label>
+            <textarea id="blockedSites" rows="8" placeholder="example.com&#10;facebook.com&#10;instagram.com"></textarea>
+        </div>
+
+        <div class="scout-section">
+            <label for="email">Accountability partner email:</label>
+            <input id="email" type="email" placeholder="partner@example.com" />
+        </div>
+
+        <div class="scout-section">
+            <label class="inline-label">
+                <input id="enabled" type="checkbox" />
+                Enable Scout monitoring
+            </label>
+        </div>
+
+        <button id="saveBtn">Save Settings</button>
+        <span id="status"></span>
+
+        <script src="options.js"></script>
+    </div>
+</body>
+</html>

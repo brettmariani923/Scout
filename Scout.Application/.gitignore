@@ -1,0 +1,36 @@
+﻿# --- Node.js ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# --- Environment variables (NEVER commit secrets) ---
+.env
+*.env
+
+# --- Chrome extension private files ---
+manifest.json
+extension/manifest.json
+Scout/Extension/manifest.json
+Scout.Application/Scout/Extension/manifest.json
+
+# --- Build artifacts ---
+dist/
+build/
+
+# --- OS / Editor files ---
+.DS_Store
+Thumbs.db
+
+# --- Logs ---
+logs/
+*.log
+logs/*.log
+
+# --- Visual Studio / VS Code ---
+.vscode/
+*.user
+*.suo
+*.cache
+*.vs
