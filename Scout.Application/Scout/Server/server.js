@@ -65,7 +65,7 @@ app.post("/email", async (req, res) => {
     }
 });
 
-// Basic HTML escape
+// Basic HTML escap
 function escapeHtml(str) {
     return String(str || "")
         .replace(/&/g, "&amp;")
