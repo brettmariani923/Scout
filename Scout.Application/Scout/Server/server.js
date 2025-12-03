@@ -7,24 +7,18 @@ const nodemailer = require("nodemailer");
 const app = express();
 
 const PORT = process.env.PORT || 3000;
-const SMTP_HOST = process.env.SMTP_HOST;
-const SMTP_PORT = Number(process.env.SMTP_PORT || 587);
-const SMTP_SECURE = process.env.SMTP_SECURE === "true";
-const SMTP_USER = process.env.SMTP_USER;
-const SMTP_PASS = process.env.SMTP_PASS;
-const FROM_ADDRESS = process.env.FROM_ADDRESS || SMTP_USER;
+const FROM_ADDRESS = process.env.FROM_ADDRESS;
 
 // Allow requests from the extension (localhost for dev)
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
+// SendGrid Transport
 const transporter = nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: SMTP_PORT,
-    secure: SMTP_SECURE,
+    service: "SendGrid",
     auth: {
-        user: SMTP_USER,
-        pass: SMTP_PASS
+        user: "apikey",
+        pass: process.env.SENDGRID_API_KEY
     }
 });
 
@@ -36,10 +30,10 @@ app.post("/email", async (req, res) => {
             return res.status(400).json({ error: "Missing required fields." });
         }
 
-        // image is a data URL: "data:image/png;base64,...."
         const base64Data = image.split(";base64,").pop();
 
         const subject = `Scout Alert: Blocked site visited`;
+
         const htmlBody = `
             <p>Scout detected a blocked site.</p>
             <ul>
@@ -53,7 +47,7 @@ app.post("/email", async (req, res) => {
         await transporter.sendMail({
             from: FROM_ADDRESS,
             to: email,
-            subject: subject,
+            subject,
             html: htmlBody,
             attachments: [
                 {
