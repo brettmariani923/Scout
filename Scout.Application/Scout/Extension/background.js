@@ -1,4 +1,4 @@
-﻿const BACKEND_URL = "http://localhost:3000/email"; // change when deploying
+﻿const BACKEND_URL = "https://scout-email-server.onrender.com/email";
 const ALERT_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes per host
 
 // In-memory map: hostname -> last alert timestamp
